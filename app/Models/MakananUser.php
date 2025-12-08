@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class MakananUser extends Model
 {
     protected $table = 'makanan_user';
+    protected $primaryKey = 'id';
     public $timestamps = false;
 
     protected $fillable = [

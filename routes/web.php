@@ -60,6 +60,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/makanan/tambah', [MakananController::class, 'tambahMakanan'])
         ->name('makanan.tambah');
 
+    Route::get('/makanan/search', [MakananController::class, 'search'])
+        ->name('makanan.search');
+
     Route::get('/makanan/gizi', [MakananController::class, 'detailGizi'])
         ->name('makanan.gizi');
 
@@ -80,10 +83,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/tantangan/progres', [TantanganController::class, 'progres'])
         ->name('tantangan.progres');
-        
+
     Route::get('/rekomendasi/workout', [RekomendasiController::class, 'rekomendasiWorkout'])
         ->name('rekomendasi.workout');
-    
+
     Route::get('/training/plan', [TrainingController::class, 'generateTrainingPlan'])
         ->name('training.plan');
 

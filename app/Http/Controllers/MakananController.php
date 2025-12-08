@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\InfoMakanan;
 use App\Models\MakananUser;
@@ -18,6 +19,7 @@ class MakananController extends Controller
     // Menyimpan makanan yang dimakan user berdasarkan jumlah porsi
     public function tambahMakanan(Request $request)
     {
+        Log::info('MakananController::tambahMakanan input', $request->all());
         $request->validate([
             'makanan_id' => 'required|exists:info_makanan,id',
             'porsi' => 'required|integer|min:1|max:10'
@@ -42,12 +44,21 @@ class MakananController extends Controller
     // Menampilkan detail gizi makanan berdasarkan porsi
     public function detailGizi(Request $request)
     {
+        // If someone visits /makanan/gizi directly without parameters,
+        // redirect them to the add-food form with a friendly message.
+        $makananId = $request->query('makanan_id') ?? $request->input('makanan_id');
+
+        if (!$makananId) {
+            return redirect()->route('makanan.form')
+                ->withErrors(['makanan_id' => 'Pilih makanan terlebih dahulu.']);
+        }
+
         $request->validate([
-            'makanan_id' => 'required|exists:info_makanan,id',
+            'makanan_id' => 'exists:info_makanan,id',
             'porsi' => 'nullable|integer|min:1|max:10'
         ]);
 
-        $info = InfoMakanan::find($request->makanan_id);
+        $info = InfoMakanan::find($makananId);
         $porsi = $request->porsi ?? 1;
 
         $gizi = [
@@ -63,13 +74,33 @@ class MakananController extends Controller
     }
 
     // Menampilkan makanan yang dimakan user hari ini
-public function makananHariIni()
-{
-    $makananHariIni = MakananUser::where('user_id', auth()->id())
-        ->whereDate('tanggal', now()->toDateString())  // Changed for consistency
-        ->with('makanan')
-        ->get();
+    public function makananHariIni()
+    {
+        $makananHariIni = MakananUser::where('user_id', auth()->id())
+            ->whereDate('tanggal', now()->toDateString())  // Changed for consistency
+            ->with('makanan')
+            ->get();
 
-    return view('makanan.harian', compact('makananHariIni'));
-}
+        return view('makanan.harian', compact('makananHariIni'));
+    }
+    public function search(Request $request)
+    {
+        $q = $request->query('q', '');
+        // Log incoming search requests for debugging
+        \Illuminate\Support\Facades\Log::info('MakananController::search', [
+            'q' => $q,
+            'auth_id' => auth()->id(),
+            'ip' => $request->ip(),
+        ]);
+
+        if (trim($q) === '') {
+            return response()->json([]);
+        }
+
+        $results = InfoMakanan::where('nama_makanan', 'like', '%' . $q . '%')
+            ->limit(10)
+            ->get(['id', 'nama_makanan', 'kalori']);
+
+        return response()->json($results);
+    }
 }

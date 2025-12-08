@@ -85,8 +85,8 @@ class AuthController extends Controller
     ]);
 
         $user = auth()->user();
-        $user->tinggi_badan = $request->tinggi_badan;
-        $user->berat_badan = $request->berat_badan;
+        $user->tinggi = $request->tinggi;
+        $user->berat = $request->berat;
         $user->save();
 
         return back()->with('success', 'Profil berhasil diperbarui!');

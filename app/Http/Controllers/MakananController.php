@@ -27,16 +27,63 @@ class MakananController extends Controller
 
         $info = InfoMakanan::find($request->makanan_id);
 
-        // Hitung total kalori berdasarkan porsi
+        // Hitung total kalori dan makronutrien berdasarkan porsi
         $totalKalori = $info->kalori * $request->porsi;
+        $totalProtein = ($info->protein ?? 0) * $request->porsi;
+        $totalKarbohidrat = ($info->karbohidrat ?? 0) * $request->porsi;
+        $totalLemak = ($info->lemak ?? 0) * $request->porsi;
 
-        MakananUser::create([
-            'user_id' => auth()->id(),
-            'makanan_id' => $info->id,
-            'tanggal' => now()->toDateString(),
-            'porsi' => $request->porsi,
-            'total_kalori' => $totalKalori
+        Log::info('MakananController::tambahMakanan calculated values', [
+            'totalKalori' => $totalKalori,
+            'totalProtein' => $totalProtein,
+            'totalKarbohidrat' => $totalKarbohidrat,
+            'totalLemak' => $totalLemak,
         ]);
+
+        try {
+
+            // Try direct DB insert instead of Eloquent
+            $insertedId = \DB::table('makanan_user')->insertGetId([
+                'user_id' => auth()->id(),
+                'makanan_id' => $info->id,
+                'tanggal' => now()->toDateString(),
+                'porsi' => $request->porsi,
+                'total_kalori' => $totalKalori,
+                'protein' => $totalProtein,
+                'karbohidrat' => $totalKarbohidrat,
+                'lemak' => $totalLemak,
+            ]);
+
+            // Retrieve the created record for logging
+            $created = \DB::table('makanan_user')->where('id', $insertedId)->first();
+
+            Log::info('MakananController::tambahMakanan created successfully', [
+                'created_id' => $created->id,
+                'user_id' => $created->user_id,
+                'makanan_id' => $created->makanan_id,
+                'total_kalori' => $created->total_kalori,
+                'protein' => $created->protein,
+                'karbohidrat' => $created->karbohidrat,
+                'lemak' => $created->lemak,
+                'tanggal' => $created->tanggal,
+            ]);
+            Log::info('MakananController::tambahMakanan created successfully', [
+                'created_id' => $created->id,
+                'user_id' => $created->user_id,
+                'makanan_id' => $created->makanan_id,
+                'total_kalori' => $created->total_kalori,
+                'protein' => $created->protein,
+                'karbohidrat' => $created->karbohidrat,
+                'lemak' => $created->lemak,
+                'tanggal' => $created->tanggal,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('MakananController::tambahMakanan failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->withErrors(['error' => 'Gagal menyimpan makanan: ' . $e->getMessage()]);
+        }
 
         return back()->with('success', 'Makanan berhasil ditambahkan!');
     }

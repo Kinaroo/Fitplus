@@ -15,7 +15,10 @@ class MakananUser extends Model
         'makanan_id',
         'tanggal',
         'porsi',
-        'total_kalori'
+        'total_kalori',
+        'protein',
+        'karbohidrat',
+        'lemak'
     ];
 
     public function user()

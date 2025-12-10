@@ -4,7 +4,7 @@
 
 @section('content')
     <h1>Dashboard</h1>
-    
+
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
         <div class="card">
             <h3>Kalori Harian</h3>
@@ -32,5 +32,20 @@
             <p style="color: #666; margin-top: 1rem;">Pantau pola tidur harian</p>
             <a href="{{ route('tidur.analisis') }}" class="btn btn-primary" style="margin-top: 1rem;">Analisis Tidur</a>
         </div>
+
+        <div class="card">
+            <h3>Rekomendasi Latihan</h3>
+            <p style="color: #666; margin-top: 1rem;">Rekomendasi workout berdasarkan IMT Anda</p>
+            <a href="{{ route('rekomendasi.workout') }}" class="btn btn-primary" style="margin-top: 1rem;">Lihat
+                Rekomendasi</a>
+        </div>
+
+        <div class="card">
+            <h3>Rencana Latihan</h3>
+            <p style="color: #666; margin-top: 1rem;">Rencana workout berdasarkan IMT Anda</p>
+            <a href="{{ route('training.plan') }}" class="btn btn-primary" style="margin-top: 1rem;">Lihat
+                Rencana</a>
+        </div>
+
     </div>
 @endsection

@@ -10,18 +10,11 @@ class TantanganUser extends Model
     public $timestamps = true; // after migration
 
     protected $fillable = [
-        'creator_user_id',
         'user_id',
         'nama_tantangan',
         'status',
-        'target_type',
-        'target_value',
-        'progress_value',
-        'workout_plan',
         'tanggal_mulai',
         'tanggal_selesai',
-        'reward',
-        'notes',
     ];
 
     protected $casts = [

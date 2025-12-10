@@ -41,7 +41,23 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard utama
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $user = auth()->user();
+
+        // Get today's calorie total
+        $totalKalori = \App\Models\MakananUser::where('user_id', $user->id)
+            ->whereDate('tanggal', now()->toDateString())
+            ->sum('total_kalori') ?? 0;
+
+        $estimasiKalori = $user->hitungKaloriHarian() ?? 2000;
+
+        \Illuminate\Support\Facades\Log::info('Dashboard calorie calc', [
+            'user_id' => $user->id,
+            'totalKalori' => $totalKalori,
+            'estimasiKalori' => $estimasiKalori,
+            'today' => now()->toDateString(),
+        ]);
+
+        return view('dashboard', compact('totalKalori', 'estimasiKalori'));
     })->name('dashboard');
 
 

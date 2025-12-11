@@ -27,7 +27,8 @@ class User extends Authenticatable
         'tingkat_aktivitas',
         'target_berat',
         'tanggal_daftar',
-        'umur'
+        'umur',
+        'is_admin'
     ];
 
     protected $hidden = ['password_hash'];

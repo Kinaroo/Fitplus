@@ -38,9 +38,8 @@ class AuthController extends Controller
             return back()->withErrors(['gagal' => 'Terjadi kesalahan saat mendaftar']);
         }
 
-
         // Login otomatis setelah register
-        auth()->loginUsingId($created->id);
+        Auth::login($created);
 
         return redirect('/dashboard');
     }
@@ -59,7 +58,7 @@ class AuthController extends Controller
 
         $user = User::authenticate($credentials['email'], $credentials['password']);
         if ($user) {
-            auth()->loginUsingId($user->id);
+            Auth::login($user);
             return redirect('/dashboard');
         }
 

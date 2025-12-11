@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 10, 2025 at 06:57 PM
+-- Generation Time: Dec 11, 2025 at 05:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,16 +53,17 @@ CREATE TABLE `akun_user` (
   `umur` int(11) DEFAULT NULL,
   `tinggi` int(11) DEFAULT NULL,
   `berat` int(11) DEFAULT NULL,
-  `tingkat_aktivitas` enum('low','mid','high') DEFAULT 'mid'
+  `tingkat_aktivitas` enum('low','mid','high') DEFAULT 'mid',
+  `is_admin` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1=admin, 0=user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `akun_user`
 --
 
-INSERT INTO `akun_user` (`id`, `nama`, `email`, `jenis_kelamin`, `tanggal_lahir`, `password_hash`, `tanggal_daftar`, `umur`, `tinggi`, `berat`, `tingkat_aktivitas`) VALUES
-(1, 'niki', 'najeroo@gmail.com', 'L', '2023-11-14', '$2y$12$TYxKgHLHl71aUpwRsPrnkO1zyMBe4UD3pW/00A6/jkTIDiUXEd5CK', NULL, NULL, 170, 60, 'mid'),
-(2, 'kontol', 'kontol@gmail.com', 'P', '2005-12-13', '$2y$12$ezxFSJkJNqm9xYYpzTdFSeme7sTsAXwMRM1W7m9q9yzOViR9RHJsS', NULL, 19, 170, 60, 'mid');
+INSERT INTO `akun_user` (`id`, `nama`, `email`, `jenis_kelamin`, `tanggal_lahir`, `password_hash`, `tanggal_daftar`, `umur`, `tinggi`, `berat`, `tingkat_aktivitas`, `is_admin`) VALUES
+(1, 'niki', 'najeroo@gmail.com', 'L', '2023-11-14', '$2y$12$TYxKgHLHl71aUpwRsPrnkO1zyMBe4UD3pW/00A6/jkTIDiUXEd5CK', NULL, NULL, 170, 60, 'mid', 1),
+(2, 'kontol', 'kontol@gmail.com', 'P', '2005-12-13', '$2y$12$ezxFSJkJNqm9xYYpzTdFSeme7sTsAXwMRM1W7m9q9yzOViR9RHJsS', NULL, 19, 170, 60, 'mid', 0);
 
 -- --------------------------------------------------------
 
@@ -3449,22 +3450,31 @@ CREATE TABLE `makanan_user` (
   `makanan_id` int(11) NOT NULL,
   `porsi` float DEFAULT 1,
   `total_kalori` float DEFAULT 0,
+  `tanggal` date DEFAULT NULL,
   `protein` float DEFAULT 0,
   `karbohidrat` float DEFAULT 0,
-  `lemak` float DEFAULT 0,
-  `tanggal` date DEFAULT NULL
+  `lemak` float DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `makanan_user`
 --
 
-INSERT INTO `makanan_user` (`id`, `user_id`, `makanan_id`, `porsi`, `total_kalori`, `protein`, `karbohidrat`, `lemak`, `tanggal`) VALUES
-(1, 1, 7, 2, 38, 0, 0, 0, '2025-12-08'),
-(2, 1, 660, 1, 578, 0, 0, 0, '2025-12-08'),
-(3, 1, 127, 1, 228, 0, 0, 0, '2025-12-09'),
-(4, 1, 100, 1, 222, 0, 0, 0, '2025-12-10'),
-(5, 1, 124, 1, 336, 0, 0, 0, '2025-12-10');
+INSERT INTO `makanan_user` (`id`, `user_id`, `makanan_id`, `porsi`, `total_kalori`, `tanggal`, `protein`, `karbohidrat`, `lemak`) VALUES
+(1, 1, 7, 2, 38, '2025-12-08', 0, 0, 0),
+(2, 1, 660, 1, 578, '2025-12-08', 0, 0, 0),
+(3, 1, 127, 1, 228, '2025-12-09', 0, 0, 0),
+(4, 1, 100, 1, 222, '2025-12-10', 0, 0, 0),
+(5, 1, 124, 1, 336, '2025-12-10', 0, 0, 0),
+(6, 1, 3, 1, 215, '2025-12-10', 0, 0, 0),
+(7, 1, 146, 1, 220, '2025-12-10', 0, 0, 0),
+(8, 1, 59, 1, 451, '2025-12-10', 0, 0, 0),
+(9, 2, 59, 1, 451, '2025-12-10', 0, 0, 0),
+(10, 2, 19, 1, 1058, '2025-12-10', 0, 0, 0),
+(11, 2, 127, 1, 228, '2025-12-10', 0, 0, 0),
+(12, 2, 45, 1, 100, '2025-12-10', 0, 0, 0),
+(13, 2, 54, 1, 94, '2025-12-10', 0, 0, 0),
+(14, 2, 46, 1, 88, '2025-12-10', 3.3, 3.6, 7.4);
 
 -- --------------------------------------------------------
 
@@ -3498,7 +3508,27 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('Xr2nLdaWYOxbJgoKYZpbWKoi1oC1irTaBYzuO8se', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiVGs1eDVyUkg3RjVXZDlTVU1lWVNMb0wyUTZ5M0JDVlNVcEtna3R0dCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9rYWxvcmkvaGFyaWFuIjtzOjU6InJvdXRlIjtzOjEzOiJrYWxvcmkuaGFyaWFuIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1765389163);
+('bneeM00VuYdceT0togyTHsGF733IkI5O22eao3pp', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiZVN2Nkl4ZVUwMTQxSEtRd2RWNnU5THFpeFNaYnFWcUw0UjJ5dmJjYSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9hZG1pbi90YW50YW5nYW4iO3M6NToicm91dGUiO3M6MjE6ImFkbWluLnRhbnRhbmdhbi5pbmRleCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1765471048),
+('QQnqdeJVWvQOeHgUFBUpE6UdcHZ3m9LChlGB1ZVa', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoid2lNcmRHWnprNVBEZ2NpTUdqbVdldHZwWlhXWjVNamVWbzRLbkNvciI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozMjoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluLXRlc3QiO31zOjk6Il9wcmV2aW91cyI7YToyOntzOjM6InVybCI7czozMzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL3VzZXJzIjtzOjU6InJvdXRlIjtzOjE3OiJhZG1pbi51c2Vycy5pbmRleCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1765469096);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tantangan`
+--
+
+CREATE TABLE `tantangan` (
+  `id` int(11) NOT NULL,
+  `nama` varchar(150) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `target_value` float DEFAULT 0,
+  `unit` varchar(50) DEFAULT NULL,
+  `tanggal_mulai` date DEFAULT NULL,
+  `tanggal_selesai` date DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -3508,11 +3538,15 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 
 CREATE TABLE `tantangan_user` (
   `id` int(11) NOT NULL,
+  `tantangan_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `nama_tantangan` varchar(150) DEFAULT NULL,
   `status` enum('belum','proses','selesai') DEFAULT 'belum',
   `tanggal_mulai` date DEFAULT NULL,
-  `tanggal_selesai` date DEFAULT NULL
+  `tanggal_selesai` date DEFAULT NULL,
+  `target_value` float DEFAULT 0,
+  `progress_value` float DEFAULT 0,
+  `unit` varchar(50) DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -3596,6 +3630,12 @@ ALTER TABLE `sessions`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `tantangan`
+--
+ALTER TABLE `tantangan`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `tantangan_user`
 --
 ALTER TABLE `tantangan_user`
@@ -3642,13 +3682,19 @@ ALTER TABLE `info_makanan`
 -- AUTO_INCREMENT for table `makanan_user`
 --
 ALTER TABLE `makanan_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tantangan`
+--
+ALTER TABLE `tantangan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tantangan_user`

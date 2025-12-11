@@ -12,7 +12,7 @@
     @else
         <div class="card" style="margin-bottom: 2rem;">
             <h2>{{ $tantangan->nama_tantangan ?? 'Tantangan' }}</h2>
-            
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
                 <div>
                     <p style="color: #666; margin-bottom: 0.5rem;">Status</p>
@@ -26,11 +26,11 @@
                         @endif
                     </p>
                 </div>
-                
+
                 <div>
                     <p style="color: #666; margin-bottom: 0.5rem;">Tanggal</p>
                     <p style="font-size: 1rem;">
-                        {{ \Carbon\Carbon::parse($tantangan->tanggal_mulai)->format('d M Y') }} - 
+                        {{ \Carbon\Carbon::parse($tantangan->tanggal_mulai)->format('d M Y') }} -
                         {{ \Carbon\Carbon::parse($tantangan->tanggal_selesai)->format('d M Y') }}
                     </p>
                 </div>
@@ -42,12 +42,22 @@
             </div>
 
             @if($selesai)
-                <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+                <div
+                    style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
                     <p style="margin: 0;">✓ Selamat! Anda telah menyelesaikan tantangan hari ini!</p>
                 </div>
             @endif
 
-            <a href="{{ route('dashboard') }}" class="btn" style="background: #95a5a6; color: white; margin-top: 1rem;">Kembali ke Dashboard</a>
+            <a href="{{ route('dashboard') }}" class="btn" style="background: #95a5a6; color: white; margin-top: 1rem;">Kembali
+                ke Dashboard</a>
         </div>
+        <form action="{{ route('tantangan.increment', $tantangan) }}" method="POST" style="margin-top:1rem;">
+            @csrf
+            <label>Increment progress ({{ $tantangan->unit ?? 'unit' }}):</label>
+            <input type="number" step="0.01" name="amount" required>
+            <button type="submit">Add</button>
+        </form>
+
+        <p>Progress: {{ $tantangan->progress_value ?? 0 }} / {{ $tantangan->target_value ?? '—' }} {{ $tantangan->unit }}</p>
     @endif
 @endsection

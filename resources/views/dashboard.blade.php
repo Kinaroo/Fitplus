@@ -47,5 +47,16 @@
                 Rencana</a>
         </div>
 
+        @if(auth()->check() && (auth()->user()->is_admin ?? 0) == 1)
+            <div class="card" style="grid-column: 1 / -1; margin-top: 1rem;">
+                <h3>Admin Panel</h3>
+                <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.75rem;">
+                    <a class="btn btn-secondary" href="{{ route('admin.tantangan.index') }}">Manage Tantangan</a>
+                    <a class="btn btn-secondary" href="{{ route('admin.users.index') }}">Manage Users</a>
+                </div>
+                <p style="color:#666; margin-top:0.5rem;">Only visible to administrators.</p>
+            </div>
+        @endif
+
     </div>
 @endsection

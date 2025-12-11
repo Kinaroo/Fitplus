@@ -8,6 +8,8 @@ use App\Http\Controllers\TantanganController;
 use App\Http\Controllers\TidurController;
 use App\Http\Controllers\RekomendasiController;
 use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\Admin\AdminTantanganController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 Route::get('/', function () {
     return view('welcome'); // or redirect()->route('login.form');
@@ -123,4 +125,33 @@ Route::middleware('auth')->group(function () {
     Route::get('/tidur/analisis', [TidurController::class, 'analisis'])
         ->name('tidur.analisis');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/tantangan', [AdminTantanganController::class, 'index'])->name('tantangan.index');
+        Route::get('/tantangan/create', [AdminTantanganController::class, 'create'])->name('tantangan.create');
+        Route::post('/tantangan', [AdminTantanganController::class, 'store'])->name('tantangan.store');
+        Route::get('/tantangan/{tantangan}/edit', [AdminTantanganController::class, 'edit'])->name('tantangan.edit');
+        Route::put('/tantangan/{tantangan}', [AdminTantanganController::class, 'update'])->name('tantangan.update');
+        Route::delete('/tantangan/{tantangan}', [AdminTantanganController::class, 'destroy'])->name('tantangan.destroy');
+
+        // user management
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    });
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/tantangan/{tantangan}', [TantanganController::class, 'show'])->name('tantangan.show');
+        Route::post('/tantangan/{tantangan}/increment', [TantanganController::class, 'incrementProgress'])->name('tantangan.increment');
+    });
+
+    Route::get('/admin-test', function () {
+        return 'admin ok';
+    })->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class]);
 });

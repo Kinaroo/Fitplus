@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\MakananUser;
-use App\Models\Workout;
+use App\Models\Exercise;
 
 class TrainingController extends Controller
 {
@@ -15,21 +15,21 @@ class TrainingController extends Controller
     public function generateTrainingPlan()
     {
         $user = auth()->user();
-
+        
         // Get today's calorie intake
-        $totalKaloriHariIni = (int) (MakananUser::where('user_id', $user->id)
+        $totalKaloriHariIni = MakananUser::where('user_id', $user->id)
             ->whereDate('tanggal', now()->toDateString())
-            ->sum('total_kalori') ?? 0);
+            ->sum('total_kalori');
 
         // Calculate metrics
-        $bmi = (float) $user->hitungIMT();
-        $estimasiKaloriHarian = (float) ($user->hitungKaloriHarian() ?? 2000);
-        $kaloriDefisit = (float) ($estimasiKaloriHarian - $totalKaloriHariIni);
-
+        $bmi = $user->hitungIMT();
+        $estimasiKaloriHarian = $user->hitungKaloriHarian() ?? 2000;
+        $kaloriDefisit = $estimasiKaloriHarian - $totalKaloriHariIni;
+        
         // Generate training plan
         $trainingPlan = $this->buatRencanaLatihan($user, $bmi, $kaloriDefisit, $totalKaloriHariIni);
-
-        return view('workout.plan', compact('trainingPlan', 'bmi', 'totalKaloriHariIni', 'estimasiKaloriHarian', 'kaloriDefisit'));
+        
+        return view('training.plan', compact('trainingPlan', 'bmi', 'totalKaloriHariIni', 'estimasiKaloriHarian', 'kaloriDefisit'));
     }
 
     /**
@@ -74,7 +74,7 @@ class TrainingController extends Controller
     {
         $exercises = [];
         foreach ($muscles as $muscle) {
-            $exs = Workout::byMuscle($muscle)->byLevel('beginner')->limit($limit)->get();
+            $exs = Exercise::byMuscle($muscle)->byLevel('beginner')->limit($limit)->get();
             if ($exs->count() > 0) {
                 $exercises[$muscle] = $exs->map(fn($e) => $e->getName())->toArray();
             }
@@ -87,7 +87,7 @@ class TrainingController extends Controller
      */
     private function getRandomExerciseByMuscle($muscle)
     {
-        $exercise = Workout::byMuscle($muscle)->inRandomOrder()->first();
+        $exercise = Exercise::byMuscle($muscle)->inRandomOrder()->first();
         return $exercise ? $exercise->getName() : $muscle . ' Exercise';
     }
 
@@ -96,12 +96,9 @@ class TrainingController extends Controller
      */
     private function kategoriBMI($bmi)
     {
-        if ($bmi < 18.5)
-            return 'Kurus (Underweight)';
-        if ($bmi < 25)
-            return 'Normal';
-        if ($bmi < 30)
-            return 'Gemuk (Overweight)';
+        if ($bmi < 18.5) return 'Kurus (Underweight)';
+        if ($bmi < 25) return 'Normal';
+        if ($bmi < 30) return 'Gemuk (Overweight)';
         return 'Obesitas';
     }
 

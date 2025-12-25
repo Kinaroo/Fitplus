@@ -27,65 +27,22 @@ class MakananController extends Controller
 
         $info = InfoMakanan::find($request->makanan_id);
 
-        // Hitung total kalori dan makronutrien berdasarkan porsi
+        // Hitung total kalori berdasarkan porsi
         $totalKalori = $info->kalori * $request->porsi;
-        $totalProtein = ($info->protein ?? 0) * $request->porsi;
-        $totalKarbohidrat = ($info->karbohidrat ?? 0) * $request->porsi;
-        $totalLemak = ($info->lemak ?? 0) * $request->porsi;
 
-        Log::info('MakananController::tambahMakanan calculated values', [
-            'totalKalori' => $totalKalori,
-            'totalProtein' => $totalProtein,
-            'totalKarbohidrat' => $totalKarbohidrat,
-            'totalLemak' => $totalLemak,
+        MakananUser::create([
+            'user_id' => auth()->id(),
+            'makanan_id' => $info->id,
+            'tanggal' => now()->toDateString(),
+            'porsi' => $request->porsi,
+            'total_kalori' => $totalKalori
         ]);
 
-        try {
+        // ✅ CLEAR CACHE AGAR LAPORAN SELALU FRESH
+        \Illuminate\Support\Facades\Cache::forget('laporan_' . auth()->id());
+        \Illuminate\Support\Facades\Cache::forget('stats_' . auth()->id());
 
-            // Try direct DB insert instead of Eloquent
-            $insertedId = \DB::table('makanan_user')->insertGetId([
-                'user_id' => auth()->id(),
-                'makanan_id' => $info->id,
-                'tanggal' => now()->toDateString(),
-                'porsi' => $request->porsi,
-                'total_kalori' => $totalKalori,
-                'protein' => $totalProtein,
-                'karbohidrat' => $totalKarbohidrat,
-                'lemak' => $totalLemak,
-            ]);
-
-            // Retrieve the created record for logging
-            $created = \DB::table('makanan_user')->where('id', $insertedId)->first();
-
-            Log::info('MakananController::tambahMakanan created successfully', [
-                'created_id' => $created->id,
-                'user_id' => $created->user_id,
-                'makanan_id' => $created->makanan_id,
-                'total_kalori' => $created->total_kalori,
-                'protein' => $created->protein,
-                'karbohidrat' => $created->karbohidrat,
-                'lemak' => $created->lemak,
-                'tanggal' => $created->tanggal,
-            ]);
-            Log::info('MakananController::tambahMakanan created successfully', [
-                'created_id' => $created->id,
-                'user_id' => $created->user_id,
-                'makanan_id' => $created->makanan_id,
-                'total_kalori' => $created->total_kalori,
-                'protein' => $created->protein,
-                'karbohidrat' => $created->karbohidrat,
-                'lemak' => $created->lemak,
-                'tanggal' => $created->tanggal,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('MakananController::tambahMakanan failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return back()->withErrors(['error' => 'Gagal menyimpan makanan: ' . $e->getMessage()]);
-        }
-
-        return back()->with('success', 'Makanan berhasil ditambahkan!');
+        return back()->with('success', 'Makanan berhasil ditambahkan dan akan terupdate di Laporan Kesehatan!');
     }
 
     // Menampilkan detail gizi makanan berdasarkan porsi
@@ -124,12 +81,13 @@ class MakananController extends Controller
     public function makananHariIni()
     {
         $makananHariIni = MakananUser::where('user_id', auth()->id())
-            ->whereDate('tanggal', now()->toDateString())  // Changed for consistency
+            ->whereDate('tanggal', now()->toDateString())
             ->with('makanan')
             ->get();
 
         return view('makanan.harian', compact('makananHariIni'));
     }
+
     public function search(Request $request)
     {
         $q = $request->query('q', '');
@@ -149,5 +107,23 @@ class MakananController extends Controller
             ->get(['id', 'nama_makanan', 'kalori']);
 
         return response()->json($results);
+    }
+
+    // Delete makanan
+    public function deleteMakanan($id)
+    {
+        try {
+            $makanan = MakananUser::where('id', $id)
+                ->where('user_id', auth()->id())
+                ->firstOrFail();
+            
+            $makanan->delete();
+            
+            return redirect()->route('makanan.harian')
+                ->with('success', 'Makanan berhasil dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus makanan: ' . $e->getMessage());
+        }
     }
 }

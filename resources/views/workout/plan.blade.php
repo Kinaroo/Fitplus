@@ -27,7 +27,7 @@
 
         <div class="card" style="background: {{ $kaloriDefisit >= 0 ? '#d4edda' : '#f8d7da' }};">
             <p style="color: #666; font-size: 0.9rem;">Kalori {{ $kaloriDefisit >= 0 ? 'Tersisa' : 'Berlebih' }}</p>
-            <h2 style="color: {{ $kaloriDefisit >= 0 ? '#27ae60' : '#e74c3c' }}; margin: 0.5rem 0;">{{ number_format(abs($kaloriDefisit), 0) }} kkal</h2>
+            <h2 style="color: {{ $kaloriDefisit >= 0 ? '#27ae60' : '#e74c3c' }}; margin: 0.5rem 0;">{{ abs(number_format($kaloriDefisit, 0)) }} kkal</h2>
             <p style="margin: 0; color: #666; font-size: 0.9rem;">{{ $kaloriDefisit >= 0 ? 'Bisa ditambah' : 'Berlebihan' }}</p>
         </div>
     </div>

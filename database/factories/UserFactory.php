@@ -22,13 +22,18 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $passwordHash = bcrypt('password');
+        
         return [
-            'name' => fake()->name(),
+            'nama' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            // use plain password instead of hashing
-            'password' => static::$password ??= 'password',
-            'remember_token' => Str::random(10),
+            'password' => $passwordHash,
+            'umur' => fake()->numberBetween(18, 60),
+            'tinggi' => fake()->numberBetween(150, 200),
+            'berat' => fake()->numberBetween(45, 100),
+            'tanggal_lahir' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
+            'jenis_kelamin' => fake()->randomElement(['L', 'P']),
+            'tingkat_aktivitas' => 1.55,
         ];
     }
 

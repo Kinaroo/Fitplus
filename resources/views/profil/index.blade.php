@@ -1,62 +1,181 @@
-@extends('layouts.app')
-
-@section('title', 'Profil - FitPlus')
-
-@section('content')
-    <div class="card" style="max-width: 600px; margin: 0 auto;">
-        <h2>Profil Saya</h2>
-
-        <form action="{{ route('profil.update') }}" method="POST">
-            @csrf
-
-            <div class="form-group">
-                <label>Nama</label>
-                <input type="text" value="{{ auth()->user()->nama }}" disabled style="background: #f5f5f5;">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - FitPlus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gradient-to-b from-teal-600 to-cyan-500 text-white p-6 shadow-xl overflow-y-auto">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-gradient-to-br from-teal-300 to-cyan-300 rounded-lg flex items-center justify-center font-bold text-teal-600 text-lg">
+                    ❤️
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">FitPlus</h2>
+                    <p class="text-xs text-blue-100">{{ auth()->user()->nama ?? 'User' }}</p>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" value="{{ auth()->user()->email }}" disabled style="background: #f5f5f5;">
+            <nav class="space-y-2">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ route('profil') }}" class="flex items-center gap-3 bg-white bg-opacity-20 px-4 py-3 rounded-lg hover:bg-opacity-30 transition">
+                    <i class="fas fa-user-circle text-lg"></i>
+                    <span class="font-medium">Profil</span>
+                </a>
+                <a href="{{ route('makanan.harian') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+                    <i class="fas fa-utensils text-lg text-red-300"></i>
+                    <span>Pelacak Nutrisi</span>
+                </a>
+                <a href="{{ route('kalori.bmi') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+                    <i class="fas fa-weight text-lg text-orange-300"></i>
+                    <span>Indeks Massa Tubuh</span>
+                </a>
+                <a href="{{ route('tidur.analisis') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+                    <i class="fas fa-moon text-lg text-indigo-300"></i>
+                    <span>Pelacak Tidur</span>
+                </a>
+                <a href="{{ route('tantangan.progres') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+                    <i class="fas fa-flag text-lg text-purple-300"></i>
+                    <span>Tantangan Olahraga</span>
+                </a>
+                <a href="{{ route('laporan.kesehatan') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+                    <i class="fas fa-chart-bar text-lg text-green-300"></i>
+                    <span>Laporan Kesehatan</span>
+                </a>
+            </nav>
+
+            <div class="mt-auto pt-6 border-t border-blue-400">
+                <a href="{{ route('logout') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500 hover:bg-opacity-20 transition text-red-200 font-medium">
+                    <i class="fas fa-sign-out-alt text-lg"></i>
+                    <span>Keluar</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <div class="bg-gradient-to-r from-teal-700 to-cyan-600 text-white px-8 py-4 flex justify-between items-center shadow-lg">
+                <h1 class="text-2xl font-bold">Profil</h1>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-300">{{ auth()->user()->nama ?? 'User' }} • {{ now()->locale('id')->format('l, j F Y') }}</span>
+                    <i class="fas fa-user-circle text-2xl"></i>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Jenis Kelamin</label>
-                <input type="text" value="{{ auth()->user()->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}" disabled
-                    style="background: #f5f5f5;">
-            </div>
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-2xl mx-auto">
+                    <!-- Card -->
+                    <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+                        <div class="mb-8 pb-6 border-b-2 border-teal-200">
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                                <i class="fas fa-user-circle text-teal-600 mr-3"></i>Data Profil Saya
+                            </h2>
+                            <p class="text-sm text-gray-600 mt-1">Kelola informasi profil dan data kesehatan Anda</p>
+                        </div>
 
-            <div class="form-group">
-                <label for="tinggi">Tinggi Badan (cm)</label>
-                <input type="number" id="tinggi" name="tinggi" value="{{ auth()->user()->tinggi }}" min="100" max="250"
-                    required>
-                @error('tinggi') <span class="error">{{ $message }}</span> @enderror
-            </div>
+                        <form action="{{ route('profil.update') }}" method="POST" class="space-y-6">
+                            @csrf
 
-            <div class="form-group">
-                <label for="berat">Berat Badan (kg)</label>
-                <input type="number" id="berat" name="berat" value="{{ auth()->user()->berat }}" min="20" max="300"
-                    step="0.1" required>
-                @error('berat') <span class="error">{{ $message }}</span> @enderror
-            </div>
+                            <!-- Nama (Disabled) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-user text-teal-600 mr-2"></i>Nama
+                                </label>
+                                <input type="text" value="{{ auth()->user()->nama }}" disabled 
+                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
+                            </div>
 
-            <div class="form-group">
-                <label for="tingkat_aktivitas">Tingkat Aktivitas Harian</label>
-                <select id="tingkat_aktivitas" name="tingkat_aktivitas" required>
-                    <option value="">-- Pilih Tingkat Aktivitas --</option>
-                    <option value="low" {{ auth()->user()->tingkat_aktivitas === 'low' ? 'selected' : '' }}>
-                        Rendah (Jarang olahraga, kerja kantoran)
-                    </option>
-                    <option value="mid" {{ auth()->user()->tingkat_aktivitas === 'mid' ? 'selected' : '' }}>
-                        Sedang (Olahraga 3-4x seminggu)
-                    </option>
-                    <option value="high" {{ auth()->user()->tingkat_aktivitas === 'high' ? 'selected' : '' }}>
-                        Tinggi (Olahraga intensif 5+ hari seminggu)
-                    </option>
-                </select>
-                @error('tingkat_aktivitas') <span class="error">{{ $message }}</span> @enderror
-            </div>
+                            <!-- Email (Disabled) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-envelope text-cyan-600 mr-2"></i>Email
+                                </label>
+                                <input type="email" value="{{ auth()->user()->email }}" disabled 
+                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
+                            </div>
 
-            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-        </form>
+                            <!-- Jenis Kelamin (Disabled) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-venus-mars text-purple-600 mr-2"></i>Jenis Kelamin
+                                </label>
+                                <input type="text" value="{{ auth()->user()->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}" disabled 
+                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
+                            </div>
+
+                            <!-- Tinggi Badan -->
+                            <div>
+                                <label for="tinggi" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-ruler-vertical text-orange-600 mr-2"></i>Tinggi Badan (cm)
+                                </label>
+                                <input type="number" id="tinggi" name="tinggi" 
+                                    value="{{ auth()->user()->tinggi ?? '' }}" 
+                                    min="100" max="250" step="0.1" required
+                                    class="w-full px-4 py-2.5 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-teal-50"
+                                    placeholder="Masukkan tinggi badan Anda">
+                                @error('tinggi')
+                                    <span class="text-red-500 text-xs mt-1 block"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Berat Badan -->
+                            <div>
+                                <label for="berat" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-weight text-cyan-600 mr-2"></i>Berat Badan (kg)
+                                </label>
+                                <input type="number" id="berat" name="berat" 
+                                    value="{{ auth()->user()->berat ?? '' }}" 
+                                    min="20" max="300" step="0.1" required
+                                    class="w-full px-4 py-2.5 border-2 border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-cyan-50"
+                                    placeholder="Masukkan berat badan Anda">
+                                @error('berat')
+                                    <span class="text-red-500 text-xs mt-1 block"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Alert Messages -->
+                            @if ($errors->any())
+                                <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4">
+                                    <p class="text-red-800 text-sm font-medium">
+                                        <i class="fas fa-exclamation-circle mr-2"></i>Ada kesalahan pada form Anda
+                                    </p>
+                                </div>
+                            @endif
+
+                            @if (session('success'))
+                                <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4">
+                                    <p class="text-green-800 text-sm font-medium">
+                                        <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+                                    </p>
+                                </div>
+                            @endif
+
+                            <!-- Buttons -->
+                            <div class="grid grid-cols-2 gap-3 pt-6 mt-8 border-t-2 border-teal-100">
+                                <a href="{{ route('dashboard') }}"
+                                    class="px-4 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition font-semibold text-center">
+                                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                                </a>
+                                <button type="submit"
+                                    class="px-4 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition font-semibold">
+                                    <i class="fas fa-save mr-2"></i>Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-@endsection
+</body>
+</html>

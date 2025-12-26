@@ -15,7 +15,12 @@ class AktivitasUser extends Model
         'nama_aktivitas',
         'durasi_menit',
         'kalori_terbakar',
-        'tanggal'
+        'tanggal',
+        'umur',
+        'berat_badan',
+        'tinggi_badan',
+        'jam_tidur',
+        'olahraga'
     ];
 
     public function user()

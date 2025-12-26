@@ -15,13 +15,10 @@ class TantanganUser extends Model
         'status',
         'tanggal_mulai',
         'tanggal_selesai',
-        'tantangan_id',
-        'target_value',
-        'progress_value',
-        'unit'
     ];
 
     protected $casts = [
+        'workout_plan' => 'array',
         'tanggal_mulai' => 'datetime',
         'tanggal_selesai' => 'datetime',
         'target_value' => 'float',

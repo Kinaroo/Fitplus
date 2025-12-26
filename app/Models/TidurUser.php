@@ -11,7 +11,7 @@ class TidurUser extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'user_id','jam_tidur','jam_bangun','durasi_jam','tanggal'
+        'user_id','jam_tidur','jam_bangun','durasi_jam','tanggal','kualitas_tidur','fase_tidur'
     ];
 
     public function user()

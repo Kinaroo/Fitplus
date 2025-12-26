@@ -24,19 +24,55 @@ class TidurController extends Controller
             'tanggal' => now()->toDateString()
         ]);
 
-        return back()->with('success', 'Data tidur tersimpan');
+        // ✅ CLEAR CACHE AGAR LAPORAN SELALU FRESH
+        \Illuminate\Support\Facades\Cache::forget('laporan_' . auth()->id());
+        \Illuminate\Support\Facades\Cache::forget('stats_' . auth()->id());
+
+        return back()->with('success', 'Data tidur tersimpan dan akan terupdate di Laporan Kesehatan');
     }
 
     public function analisis()
     {
-        $tidur = TidurUser::where('user_id', auth()->id())
-            ->latest('tanggal')
+        $userId = auth()->id();
+        $today = now()->toDateString();
+
+        // Data tidur hari ini (ambil yang paling terbaru)
+        $tidurHariIni = TidurUser::where('user_id', $userId)
+            ->where('tanggal', $today)
+            ->orderBy('id', 'desc')
             ->first();
 
-        $hasil = $tidur
-            ? $tidur->analisis()
-            : "Belum ada data tidur";
+        // Riwayat tidur 7 hari terakhir (diurutkan dari terbaru)
+        $riwayatTidur = TidurUser::where('user_id', $userId)
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc')
+            ->limit(7)
+            ->get();
 
-        return view('tidur.analisis', compact('hasil'));
+        // Total tidur bulan ini
+        $totalTidurBulanIni = TidurUser::where('user_id', $userId)
+            ->whereYear('tanggal', now()->year)
+            ->whereMonth('tanggal', now()->month)
+            ->sum('durasi_jam');
+
+        // Rata-rata tidur 7 hari (hanya dari data yang ada)
+        $rataRataTidur = 0;
+        if ($riwayatTidur->count() > 0) {
+            $totalJam = $riwayatTidur->sum('durasi_jam');
+            $rataRataTidur = $totalJam / $riwayatTidur->count();
+        }
+
+        // Analisis hasil
+        $hasil = $tidurHariIni
+            ? $tidurHariIni->analisis()
+            : "Belum ada data tidur hari ini";
+
+        return view('tidur.analisis', compact(
+            'tidurHariIni',
+            'riwayatTidur',
+            'totalTidurBulanIni',
+            'rataRataTidur',
+            'hasil'
+        ));
     }
 }

@@ -15,15 +15,17 @@ class MakananUser extends Model
         'makanan_id',
         'tanggal',
         'porsi',
-        'total_kalori',
-        'protein',
-        'karbohidrat',
-        'lemak'
+        'total_kalori'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function makanan()
+    {
+        return $this->belongsTo(InfoMakanan::class, 'makanan_id');
     }
 
     public function infoMakanan()

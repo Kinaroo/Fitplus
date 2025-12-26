@@ -8,6 +8,7 @@ use App\Http\Controllers\TantanganController;
 use App\Http\Controllers\TidurController;
 use App\Http\Controllers\RekomendasiController;
 use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\Admin\AdminTantanganController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
@@ -124,6 +125,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/tidur/analisis', [TidurController::class, 'analisis'])
         ->name('tidur.analisis');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Laporan
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/laporan/mingguan', [LaporanController::class, 'mingguan'])
+        ->name('laporan.mingguan');
 
     /*
     |--------------------------------------------------------------------------

@@ -47,6 +47,12 @@
                 Rencana</a>
         </div>
 
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h3 style="color: white;">📊 Laporan Mingguan</h3>
+            <p style="color: rgba(255,255,255,0.9); margin-top: 1rem;">Lihat ringkasan diet, tidur, dan workout Anda dalam seminggu terakhir</p>
+            <a href="{{ route('laporan.mingguan') }}" class="btn" style="margin-top: 1rem; background: white; color: #667eea;">Lihat Laporan</a>
+        </div>
+
         @if(auth()->check() && (auth()->user()->is_admin ?? 0) == 1)
             <div class="card" style="grid-column: 1 / -1; margin-top: 1rem;">
                 <h3>Admin Panel</h3>

@@ -10,12 +10,7 @@ use App\Models\User;
 
 class AdminTantanganController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class]);
-    }
-
-public function index()
+    public function index()
 {
     // avoid model table mismatch: read directly from DB
     $tantangan = \DB::table('tantangan')->orderBy('tanggal_mulai','desc')->get();

@@ -12,23 +12,23 @@ class User extends Authenticatable
 {
     use HasFactory;
 
-    protected $table = 'users';
+    protected $table = 'akun_user';
     protected $primaryKey = 'id';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
-        'nama','email','password','jenis_kelamin','tanggal_lahir',
+        'nama','email','password_hash','jenis_kelamin','tanggal_lahir',
         'tinggi','berat','tingkat_aktivitas','umur'
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = ['password_hash'];
 
     /**
-     * Override getAuthPassword to use password field
+     * Override getAuthPassword to use password_hash field (database column)
      */
     public function getAuthPassword()
     {
-        return $this->password;
+        return $this->password_hash;
     }
 
     /**
@@ -119,7 +119,15 @@ class User extends Authenticatable
             ? 10 * $this->berat + 6.25 * $this->tinggi - 5 * $umur + 5
             : 10 * $this->berat + 6.25 * $this->tinggi - 5 * $umur - 161;
 
-        return $bmr * ($this->tingkat_aktivitas ?? 1.55);
+        // Convert tingkat_aktivitas enum to multiplier
+        $multiplier = match($this->tingkat_aktivitas) {
+            'low' => 1.2,
+            'mid' => 1.55,
+            'high' => 1.9,
+            default => 1.55
+        };
+
+        return $bmr * $multiplier;
     }
 
     public function hitungKaloriHariIni()

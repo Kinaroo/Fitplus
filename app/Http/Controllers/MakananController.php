@@ -37,11 +37,6 @@ class MakananController extends Controller
             'porsi' => $request->porsi,
             'total_kalori' => $totalKalori
         ]);
-
-        // ✅ CLEAR CACHE AGAR LAPORAN SELALU FRESH
-        \Illuminate\Support\Facades\Cache::forget('laporan_' . auth()->id());
-        \Illuminate\Support\Facades\Cache::forget('stats_' . auth()->id());
-
         return back()->with('success', 'Makanan berhasil ditambahkan dan akan terupdate di Laporan Kesehatan!');
     }
 

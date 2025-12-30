@@ -13,13 +13,6 @@ class LaporanController extends Controller
     public function kesehatan(Request $request)
     {
         try {
-            // ✅ PASTIKAN CACHE FRESH (clear cache saat user akses laporan)
-            $tempUserId = auth()->id();
-            if ($tempUserId) {
-                \Illuminate\Support\Facades\Cache::forget('laporan_' . $tempUserId);
-                \Illuminate\Support\Facades\Cache::forget('stats_' . $tempUserId);
-            }
-
             // Debug auth - detailed logging
             $authCheck = auth()->check();
             $userId = auth()->id();

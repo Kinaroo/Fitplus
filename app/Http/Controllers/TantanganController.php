@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TantanganUser;
+use App\Models\Tantangan;
 use App\Models\AktivitasUser;
 
 class TantanganController extends Controller
@@ -25,10 +26,6 @@ class TantanganController extends Controller
             'tanggal_selesai' => now()->addDays($request->durasi_hari)->toDateString(),
         ]);
 
-        // ✅ CLEAR CACHE AGAR LAPORAN SELALU FRESH
-        \Illuminate\Support\Facades\Cache::forget('laporan_' . auth()->id());
-        \Illuminate\Support\Facades\Cache::forget('stats_' . auth()->id());
-
         return back()->with('success', 'Tantangan berhasil dibuat dan akan terupdate di Laporan Kesehatan!');
     }
 
@@ -36,59 +33,59 @@ class TantanganController extends Controller
     {
         $userId = auth()->id();
 
-        // Ambil tantangan terbaru user
+        // Ambil tantangan terbaru user yang sedang aktif
         $tantangan = TantanganUser::where('user_id', $userId)
             ->orderBy('id', 'desc')
             ->first();
 
-        if (!$tantangan) {
-            return view('tantangan.progres', [
-                'pesan' => 'Belum ada tantangan aktif'
-            ]);
-        }
+        // Ambil tantangan dari admin yang belum diikuti user
+        $availableChallenges = Tantangan::whereDoesntHave('assignments', function($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->where('tanggal_selesai', '>=', now()->toDateString())
+            ->orderBy('tanggal_mulai', 'asc')
+            ->get();
 
         // Hitung progres kalori keluar hari ini
         $kaloriHariIni = AktivitasUser::where('user_id', $userId)
             ->whereDate('tanggal', now())
             ->sum('kalori_terbakar');
 
-        $selesai = false; // placeholder since target columns don't exist
+        $selesai = false;
+        if ($tantangan && $tantangan->target_value && $tantangan->progress_value >= $tantangan->target_value) {
+            $selesai = true;
+        }
 
-        return view('tantangan.progres', compact('tantangan', 'kaloriHariIni', 'selesai'));
+        return view('tantangan.progres', compact('tantangan', 'kaloriHariIni', 'selesai', 'availableChallenges'));
     }
 
-    public function acceptPlan(Request $request)
+    public function ikutTantangan(Request $request, $id)
     {
-        $user = auth()->user();
-        // validate request input (plan JSON or derive it again)
-        $request->validate([
-            'plan' => 'required|array',
-            'name' => 'nullable|string|max:255',
-            'target_type' => 'nullable|string',
-            'target_value' => 'nullable|numeric'
-        ]);
+        $tantangan = Tantangan::findOrFail($id);
+        $userId = auth()->id();
 
-        $plan = $request->input('plan');
+        // Check if user already joined
+        $existing = TantanganUser::where('user_id', $userId)
+            ->where('tantangan_id', $id)
+            ->first();
 
-        $challenge = \App\Models\TantanganUser::create([
-            'creator_user_id' => null, // system
-            'user_id' => $user->id,
-            'nama_tantangan' => $request->input('name') ?? 'Rencana Latihan Personalisasi',
-            'status' => 'active',
-            'target_type' => $request->input('target_type') ?? 'sessions',
-            'target_value' => $request->input('target_value') ?? 12,
+        if ($existing) {
+            return back()->with('error', 'Anda sudah mengikuti tantangan ini!');
+        }
+
+        TantanganUser::create([
+            'user_id' => $userId,
+            'nama_tantangan' => $tantangan->nama,
+            'status' => 'proses',
+            'tanggal_mulai' => $tantangan->tanggal_mulai,
+            'tanggal_selesai' => $tantangan->tanggal_selesai,
+            'tantangan_id' => $tantangan->id,
+            'target_value' => $tantangan->target_value,
             'progress_value' => 0,
-            'workout_plan' => $plan,
-            'tanggal_mulai' => now(),
-            'tanggal_selesai' => now()->addWeeks(4),
-            'reward' => $request->input('reward') ?? null,
+            'unit' => $tantangan->unit,
         ]);
 
-        // ✅ CLEAR CACHE AGAR LAPORAN SELALU FRESH
-        \Illuminate\Support\Facades\Cache::forget('laporan_' . $user->id);
-        \Illuminate\Support\Facades\Cache::forget('stats_' . $user->id);
-
-        return redirect()->route('tantangan.progres')->with('success', 'Rencana disimpan sebagai tantangan dan akan terupdate di Laporan Kesehatan!');
+        return back()->with('success', 'Berhasil bergabung dengan tantangan: ' . $tantangan->nama);
     }
 
     public function tambahProgress(Request $request, $id)

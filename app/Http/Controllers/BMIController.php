@@ -10,15 +10,10 @@ class BMIController extends Controller
     {
         $user = auth()->user();
         
-        // Ambil data terbaru dari health data user
-        $latestHealthData = \App\Models\AktivitasUser::where('user_id', $user->id)
-            ->latest('tanggal')
-            ->first();
-        
-        // Inisialisasi nilai default - gunakan old() untuk form resubmit
-        $beratBadan = old('berat_badan', $latestHealthData?->berat_badan ?? '');
-        $tinggiBadan = old('tinggi_badan', $latestHealthData?->tinggi_badan ?? '');
-        $umur = $latestHealthData?->umur ?? 0;
+        // Inisialisasi nilai default - gunakan old() untuk form resubmit atau data user
+        $beratBadan = old('berat_badan', $user->berat ?? '');
+        $tinggiBadan = old('tinggi_badan', $user->tinggi ?? '');
+        $umur = $user->umur ?? 0;
         
         $bmi = 0;
         $kategori = '';
@@ -86,24 +81,11 @@ class BMIController extends Controller
         ]);
 
         $user = auth()->user();
-        $today = now()->toDateString();
 
-        // ✅ SIMPAN DATA KE DATABASE aktivitas_user
-        \App\Models\AktivitasUser::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'tanggal' => $today
-            ],
-            [
-                'berat_badan' => $validated['berat_badan'],
-                'tinggi_badan' => $validated['tinggi_badan'],
-                'olahraga' => 0  // Default jika belum ada
-            ]
-        );
-
-        // ✅ CLEAR CACHE AGAR LAPORAN SELALU FRESH
-        \Illuminate\Support\Facades\Cache::forget('laporan_' . $user->id);
-        \Illuminate\Support\Facades\Cache::forget('stats_' . $user->id);
+        // ✅ SIMPAN DATA KE DATABASE akun_user
+        $user->berat = $validated['berat_badan'];
+        $user->tinggi = $validated['tinggi_badan'];
+        $user->save();
 
         return redirect()->route('kalori.bmi')
             ->withInput($validated)

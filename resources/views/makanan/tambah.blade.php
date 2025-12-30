@@ -10,39 +10,7 @@
 <body class="bg-gray-100">
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <div class="w-64 bg-gradient-to-b from-teal-600 to-cyan-500 text-white p-6 shadow-xl overflow-y-auto">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-12 h-12 bg-gradient-to-br from-teal-300 to-cyan-300 rounded-lg flex items-center justify-center font-bold text-teal-600 text-lg">
-                    ❤️
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold">FitPlus</h2>
-                    <p class="text-xs text-blue-100">{{ auth()->user()->nama ?? 'User' }}</p>
-                </div>
-            </div>
-
-            <nav class="space-y-2">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-                    <i class="fas fa-chart-line text-lg"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{ route('profil') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-                    <i class="fas fa-user-circle text-lg"></i>
-                    <span>Profil</span>
-                </a>
-                <a href="{{ route('makanan.harian') }}" class="flex items-center gap-3 bg-white bg-opacity-20 px-4 py-3 rounded-lg hover:bg-opacity-30 transition">
-                    <i class="fas fa-utensils text-lg text-red-300"></i>
-                    <span>Pelacak Nutrisi</span>
-                </a>
-            </nav>
-
-            <div class="mt-auto pt-6 border-t border-blue-400">
-                <a href="{{ route('logout') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500 hover:bg-opacity-20 transition text-red-200 font-medium">
-                    <i class="fas fa-sign-out-alt text-lg"></i>
-                    <span>Keluar</span>
-                </a>
-            </div>
-        </div>
+        @include('partials.sidebar')
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">

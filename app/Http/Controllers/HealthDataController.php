@@ -92,7 +92,6 @@ class HealthDataController extends Controller
                 ],
                 [
                     'durasi_jam' => (float) $validated['tidur'],
-                    'kualitas_tidur' => 8, // Default value (scale 1-10)
                 ]
             );
 
@@ -104,11 +103,18 @@ class HealthDataController extends Controller
                 'wasRecentlyCreated' => $tidur->wasRecentlyCreated,
             ]);
             
+            // 3. Update user's berat in akun_user for BMI calculations
+            $user->berat = $validated['berat_badan'];
+            $user->tinggi = $validated['tinggi_badan'];
+            $user->save();
+            
+            Log::info('User weight/height updated', [
+                'user_id' => $user->id,
+                'berat' => $validated['berat_badan'],
+                'tinggi' => $validated['tinggi_badan'],
+            ]);
+            
             Log::info('=== STORE HEALTH DATA COMPLETE ===');
-
-            // ✅ CLEAR CACHE AGAR LAPORAN SELALU FRESH
-            \Illuminate\Support\Facades\Cache::forget('laporan_' . $user->id);
-            \Illuminate\Support\Facades\Cache::forget('stats_' . $user->id);
 
             return redirect()->route('dashboard')
                 ->with('success', 'Data kesehatan berhasil ditambahkan dan akan terupdate di Laporan Kesehatan!');

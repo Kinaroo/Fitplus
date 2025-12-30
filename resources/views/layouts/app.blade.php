@@ -33,6 +33,9 @@
         <div>
             @auth
                 <a href="{{ route('dashboard') }}">Dashboard</a>
+                @if(auth()->user()->is_admin)
+                    <a href="{{ route('admin.users.index') }}" style="color: #f39c12;">⚙️ Admin</a>
+                @endif
                 <a href="{{ route('profil') }}">Profil</a>
                 <a href="{{ route('logout') }}">Logout</a>
             @else

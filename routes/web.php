@@ -12,6 +12,8 @@ use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\HealthDataController;
 use App\Http\Controllers\BMIController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\AdminTantanganController;
 
 // Route Homepage
 Route::get('/', function () {
@@ -20,36 +22,6 @@ Route::get('/', function () {
     }
     return view('homepage_new'); // Serve the new homepage view
 })->name('home');
-
-// Test route - status page
-Route::get('/laporan/test-status', function () {
-    return view('laporan.test-status');
-})->name('laporan.test-status');
-
-// Test route - laporan debug
-Route::get('/test-laporan', function () {
-    return view('test-laporan');
-})->name('test-laporan');
-
-// Test route - login & laporan
-Route::get('/test-login-laporan', function () {
-    return view('test-login-laporan');
-})->name('test-login-laporan');
-
-// Test route - laporan access test
-Route::get('/test-laporan-access', function () {
-    return view('test-laporan-access');
-})->name('test-laporan-access');
-
-// Check login status
-Route::get('/check-login', function () {
-    return view('check-login');
-})->name('check-login');
-
-// Debug access route
-Route::get('/laporan/debug', function () {
-    return view('laporan.debug-access');
-})->name('laporan.debug');
 
 /*
 |--------------------------------------------------------------------------
@@ -109,6 +81,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/tantangan/buat', [TantanganController::class, 'buat'])->name('tantangan.buat');
     Route::get('/tantangan/progres', [TantanganController::class, 'progres'])->name('tantangan.progres');
     Route::post('/tantangan/{id}/progress', [TantanganController::class, 'tambahProgress'])->name('tantangan.progress.add');
+    Route::post('/tantangan/{id}/ikut', [TantanganController::class, 'ikutTantangan'])->name('tantangan.ikut');
 
     /*
     |--------------------------------------------------------------------------
@@ -116,8 +89,9 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('/rekomendasi/workout', [RekomendasiController::class, 'rekomendasiWorkout'])->name('rekomendasi.workout');
-    Route::get('/training/plan', [TrainingController::class, 'generateTrainingPlan'])->name('training.plan');
-    Route::post('/training/accept', [TrainingController::class, 'acceptPlan'])->name('training.accept');
+    Route::get('/training/workouts', [TrainingController::class, 'workouts'])->name('training.workouts');
+    Route::get('/training/schedule', [TrainingController::class, 'schedule'])->name('training.schedule');
+    Route::post('/training/schedule/generate', [TrainingController::class, 'generateSchedule'])->name('training.schedule.generate');
 
     /*
     |--------------------------------------------------------------------------
@@ -138,15 +112,6 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Laporan
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/laporan/mingguan', [LaporanController::class, 'mingguan'])
-        ->name('laporan.mingguan');
-
-    /*
-    |--------------------------------------------------------------------------
     | Laporan Kesehatan
     |--------------------------------------------------------------------------
     */
@@ -160,10 +125,33 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/laporan/kesehatan', [LaporanController::class, 'kesehatan'])->name('laporan.kesehatan')->middleware('laporan.auth');
     Route::get('/laporan/kesehatan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.kesehatan.pdf')->middleware('laporan.auth');
-    Route::get('/laporan/simple-test', function () {
-        $user = auth()->user();
-        $stats = ['berat_hari' => '75 kg'];
-        return view('laporan.simple-test', compact('user', 'stats'));
-    })->name('laporan.simple-test');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // Admin Dashboard
+        Route::get('/', function () {
+            return redirect()->route('admin.users.index');
+        })->name('dashboard');
+
+        // User Management
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Challenge Management
+        Route::get('/tantangan', [AdminTantanganController::class, 'index'])->name('tantangan.index');
+        Route::get('/tantangan/create', [AdminTantanganController::class, 'create'])->name('tantangan.create');
+        Route::post('/tantangan', [AdminTantanganController::class, 'store'])->name('tantangan.store');
+        Route::get('/tantangan/{tantangan}/edit', [AdminTantanganController::class, 'edit'])->name('tantangan.edit');
+        Route::put('/tantangan/{tantangan}', [AdminTantanganController::class, 'update'])->name('tantangan.update');
+        Route::delete('/tantangan/{tantangan}', [AdminTantanganController::class, 'destroy'])->name('tantangan.destroy');
+    });

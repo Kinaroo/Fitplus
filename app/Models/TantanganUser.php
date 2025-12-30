@@ -7,7 +7,7 @@ class TantanganUser extends Model
 {
     protected $table = 'tantangan_user';
     protected $primaryKey = 'id';
-    public $timestamps = true; // after migration
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
@@ -15,6 +15,10 @@ class TantanganUser extends Model
         'status',
         'tanggal_mulai',
         'tanggal_selesai',
+        'tantangan_id',
+        'target_value',
+        'progress_value',
+        'unit',
     ];
 
     protected $casts = [

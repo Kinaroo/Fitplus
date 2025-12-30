@@ -11,22 +11,14 @@ class TidurController extends Controller
     {
         $request->validate([
             'durasi_tidur' => 'required|numeric|min:0.25',
-            'kualitas_tidur' => 'nullable|numeric',
-            'fase_tidur' => 'nullable|string'
         ]);
 
         // store into the model's durasi_jam field so analisis() uses it
         \App\Models\TidurUser::create([
             'user_id' => auth()->id(),
             'durasi_jam' => $request->durasi_tidur,
-            'kualitas_tidur' => $request->kualitas_tidur ?? null,
-            'fase_tidur' => $request->fase_tidur ?? null,
             'tanggal' => now()->toDateString()
         ]);
-
-        // ✅ CLEAR CACHE AGAR LAPORAN SELALU FRESH
-        \Illuminate\Support\Facades\Cache::forget('laporan_' . auth()->id());
-        \Illuminate\Support\Facades\Cache::forget('stats_' . auth()->id());
 
         return back()->with('success', 'Data tidur tersimpan dan akan terupdate di Laporan Kesehatan');
     }

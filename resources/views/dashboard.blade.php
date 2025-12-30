@@ -10,56 +10,7 @@
 <body class="bg-gray-100">
 
     <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-64 bg-gradient-to-b from-teal-600 to-cyan-500 text-white p-6 shadow-xl overflow-y-auto">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-12 h-12 bg-gradient-to-br from-teal-300 to-cyan-300 rounded-lg flex items-center justify-center font-bold text-teal-600 text-lg">
-                    ❤️
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold">FitPlus</h2>
-                    <p class="text-xs text-blue-100">{{ auth()->user()->nama ?? 'User' }}</p>
-                </div>
-            </div>
-
-            <nav class="space-y-2">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 bg-white bg-opacity-20 px-4 py-3 rounded-lg hover:bg-opacity-30 transition">
-                    <i class="fas fa-chart-line text-lg"></i>
-                    <span class="font-medium">Dashboard</span>
-                </a>
-                <a href="{{ route('profil') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-                    <i class="fas fa-user-circle text-lg"></i>
-                    <span>Profil</span>
-                </a>
-                <a href="{{ route('makanan.harian') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-                    <i class="fas fa-utensils text-lg text-red-300"></i>
-                    <span>Pelacak Nutrisi</span>
-                </a>
-                <a href="{{ route('kalori.bmi') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-                    <i class="fas fa-weight text-lg text-orange-300"></i>
-                    <span>Indeks Massa Tubuh</span>
-                </a>
-                <a href="{{ route('tidur.analisis') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-                    <i class="fas fa-moon text-lg text-indigo-300"></i>
-                    <span>Pelacak Tidur</span>
-                </a>
-                <a href="{{ route('tantangan.progres') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-                    <i class="fas fa-flag text-lg text-purple-300"></i>
-                    <span>Tantangan Olahraga</span>
-                </a>
-                <a href="{{ route('laporan.kesehatan') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-                    <i class="fas fa-chart-bar text-lg text-green-300"></i>
-                    <span>Laporan Kesehatan</span>
-                </a>
-            </nav>
-
-            <div class="mt-auto pt-6 border-t border-blue-400">
-                <a href="{{ route('logout') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500 hover:bg-opacity-20 transition text-red-200 font-medium">
-                    <i class="fas fa-sign-out-alt text-lg"></i>
-                    <span>Keluar</span>
-                </a>
-            </div>
-        </div>
+        @include('partials.sidebar')
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
@@ -77,7 +28,8 @@
         <!-- Statistik Hari Ini -->
         <section class="mb-8">
             <h2 class="text-lg font-bold text-gray-800 mb-4">Statistik Hari Ini</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <!-- Card Umur -->
                 <div class="bg-white rounded-lg border-b-4 border-teal-400 p-5 hover:shadow transition">
                     <div class="flex items-center justify-between mb-3">
@@ -98,13 +50,23 @@
                     <p class="text-xs text-gray-500 mt-1">kg</p>
                 </div>
 
+                <!-- Card Tinggi Badan -->
+                <div class="bg-white rounded-lg border-b-4 border-purple-400 p-5 hover:shadow transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-gray-600 text-sm font-medium">Tinggi Badan</h3>
+                        <i class="fas fa-ruler-vertical text-purple-400 text-lg"></i>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-800">{{ $todayData?->tinggi_badan ?? '-' }}</p>
+                    <p class="text-xs text-gray-500 mt-1">cm</p>
+                </div>
+
                 <!-- Card Jam Tidur -->
                 <div class="bg-white rounded-lg border-b-4 border-lime-400 p-5 hover:shadow transition">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-gray-600 text-sm font-medium">Jam Tidur</h3>
                         <i class="fas fa-moon text-lime-400 text-lg"></i>
                     </div>
-                    <p class="text-3xl font-bold text-gray-800">{{ $todayTidur?->durasi_jam ?? '-' }}</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ $todayData?->jam_tidur ?? '-' }}</p>
                     <p class="text-xs text-gray-500 mt-1">jam</p>
                 </div>
 
@@ -152,10 +114,10 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-700">{{ $data->umur }} tahun</td>
                                 <td class="px-6 py-4 text-sm text-gray-700">
-                                    <i class="fas fa-weight text-cyan-500 mr-2"></i>{{ $data->berat }} kg
+                                    <i class="fas fa-weight text-cyan-500 mr-2"></i>{{ $data->berat_badan }} kg
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-700">
-                                    <i class="fas fa-ruler-vertical text-purple-500 mr-2"></i>{{ $data->tinggi }} cm
+                                    <i class="fas fa-ruler-vertical text-purple-500 mr-2"></i>{{ $data->tinggi_badan }} cm
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-700">
                                     <i class="fas fa-moon text-lime-500 mr-2"></i>{{ $data->jam_tidur }} jam

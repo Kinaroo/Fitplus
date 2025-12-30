@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 08, 2025 at 05:26 PM
+-- Generation Time: Dec 30, 2025 at 11:36 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,8 +33,24 @@ CREATE TABLE `aktivitas_user` (
   `nama_aktivitas` varchar(150) DEFAULT NULL,
   `durasi_menit` int(11) DEFAULT NULL,
   `kalori_terbakar` int(11) DEFAULT NULL,
-  `tanggal` date DEFAULT NULL
+  `tanggal` date DEFAULT NULL,
+  `umur` int(11) DEFAULT NULL,
+  `berat_badan` decimal(5,2) DEFAULT NULL,
+  `tinggi_badan` int(11) DEFAULT NULL,
+  `jam_tidur` decimal(3,1) DEFAULT NULL,
+  `olahraga` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `aktivitas_user`
+--
+
+INSERT INTO `aktivitas_user` (`id`, `user_id`, `nama_aktivitas`, `durasi_menit`, `kalori_terbakar`, `tanggal`, `umur`, `berat_badan`, `tinggi_badan`, `jam_tidur`, `olahraga`) VALUES
+(2, 1, NULL, NULL, NULL, '2025-12-30', NULL, NULL, NULL, NULL, NULL),
+(3, 1, NULL, NULL, NULL, '2025-12-30', 21, 60.00, 170, 8.0, 60),
+(4, 1, NULL, NULL, NULL, '2025-12-30', 21, 60.00, 170, 8.0, 60),
+(5, 1, NULL, NULL, NULL, '2025-12-30', 21, 60.00, 170, 8.0, 60),
+(6, 1, NULL, NULL, NULL, '2025-12-30', 21, 60.00, 170, 8.0, 60);
 
 -- --------------------------------------------------------
 
@@ -52,15 +68,18 @@ CREATE TABLE `akun_user` (
   `tanggal_daftar` date DEFAULT NULL,
   `umur` int(11) DEFAULT NULL,
   `tinggi` int(11) DEFAULT NULL,
-  `berat` int(11) DEFAULT NULL
+  `berat` int(11) DEFAULT NULL,
+  `tingkat_aktivitas` enum('low','mid','high') DEFAULT 'mid',
+  `is_admin` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1=admin, 0=user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `akun_user`
 --
 
-INSERT INTO `akun_user` (`id`, `nama`, `email`, `jenis_kelamin`, `tanggal_lahir`, `password_hash`, `tanggal_daftar`, `umur`, `tinggi`, `berat`) VALUES
-(1, 'niki', 'najeroo@gmail.com', 'L', '2023-11-14', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, NULL, NULL, NULL);
+INSERT INTO `akun_user` (`id`, `nama`, `email`, `jenis_kelamin`, `tanggal_lahir`, `password_hash`, `tanggal_daftar`, `umur`, `tinggi`, `berat`, `tingkat_aktivitas`, `is_admin`) VALUES
+(1, 'niki', 'najeroo@gmail.com', 'L', '2023-11-14', '$2y$12$TYxKgHLHl71aUpwRsPrnkO1zyMBe4UD3pW/00A6/jkTIDiUXEd5CK', NULL, NULL, 170, 60, 'mid', 1),
+(2, 'kontol', 'kontol@gmail.com', 'P', '2005-12-13', '$2y$12$ezxFSJkJNqm9xYYpzTdFSeme7sTsAXwMRM1W7m9q9yzOViR9RHJsS', NULL, 19, 170, 60, 'mid', 0);
 
 -- --------------------------------------------------------
 
@@ -3447,8 +3466,34 @@ CREATE TABLE `makanan_user` (
   `makanan_id` int(11) NOT NULL,
   `porsi` float DEFAULT 1,
   `total_kalori` float DEFAULT 0,
-  `tanggal` date DEFAULT NULL
+  `tanggal` date DEFAULT NULL,
+  `protein` float DEFAULT 0,
+  `karbohidrat` float DEFAULT 0,
+  `lemak` float DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `makanan_user`
+--
+
+INSERT INTO `makanan_user` (`id`, `user_id`, `makanan_id`, `porsi`, `total_kalori`, `tanggal`, `protein`, `karbohidrat`, `lemak`) VALUES
+(1, 1, 7, 2, 38, '2025-12-08', 0, 0, 0),
+(2, 1, 660, 1, 578, '2025-12-08', 0, 0, 0),
+(3, 1, 127, 1, 228, '2025-12-09', 0, 0, 0),
+(4, 1, 100, 1, 222, '2025-12-10', 0, 0, 0),
+(5, 1, 124, 1, 336, '2025-12-10', 0, 0, 0),
+(6, 1, 3, 1, 215, '2025-12-10', 0, 0, 0),
+(7, 1, 146, 1, 220, '2025-12-10', 0, 0, 0),
+(8, 1, 59, 1, 451, '2025-12-10', 0, 0, 0),
+(9, 2, 59, 1, 451, '2025-12-10', 0, 0, 0),
+(10, 2, 19, 1, 1058, '2025-12-10', 0, 0, 0),
+(11, 2, 127, 1, 228, '2025-12-10', 0, 0, 0),
+(12, 2, 45, 1, 100, '2025-12-10', 0, 0, 0),
+(13, 2, 54, 1, 94, '2025-12-10', 0, 0, 0),
+(14, 2, 46, 1, 88, '2025-12-10', 3.3, 3.6, 7.4),
+(15, 1, 100, 1, 222, '2025-12-11', 2.4, 29.4, 10.5),
+(16, 1, 3, 1, 215, '2025-12-30', 0, 0, 0),
+(17, 1, 127, 1, 228, '2025-12-30', 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -3482,8 +3527,26 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('exkIMstbocvXx2ykTdb5fMlRFzsAArNPQVppdta5', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiRUs3cGc4aE9UaXZ5MFpYYWlkV3FKd1RjNG5ja2NyZXRJak1KSWZmMSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6OToiZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1765211148),
-('gJ0OrgQVqn4lPZ70TBSoOcmQmyjM4RmbWdewOJTZ', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiWlg0cXpsbmhIWGZFOUZUNXFFZFlUS3ZJUlB6UERNMU9YbmtYMHBHZyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9rYWxvcmkvaGFyaWFuIjtzOjU6InJvdXRlIjtzOjEzOiJrYWxvcmkuaGFyaWFuIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozMToiaHR0cDovL2xvY2FsaG9zdDo4MDAwL2Rhc2hib2FyZCI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1765125674);
+('JgkH6Ue5ZthbYahbC2bxLUZHIwda0AJiEcKToMhg', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiQlpOZE54dllBYWZ6TjdwYkdxekxoV1dkY2pvRkR0eHBURGZUemg1WSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6OToiZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1767091000);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tantangan`
+--
+
+CREATE TABLE `tantangan` (
+  `id` int(11) NOT NULL,
+  `nama` varchar(150) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `target_value` float DEFAULT 0,
+  `unit` varchar(50) DEFAULT NULL,
+  `tanggal_mulai` date DEFAULT NULL,
+  `tanggal_selesai` date DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -3493,11 +3556,15 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 
 CREATE TABLE `tantangan_user` (
   `id` int(11) NOT NULL,
+  `tantangan_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `nama_tantangan` varchar(150) DEFAULT NULL,
   `status` enum('belum','proses','selesai') DEFAULT 'belum',
   `tanggal_mulai` date DEFAULT NULL,
-  `tanggal_selesai` date DEFAULT NULL
+  `tanggal_selesai` date DEFAULT NULL,
+  `target_value` float DEFAULT 0,
+  `progress_value` float DEFAULT 0,
+  `unit` varchar(50) DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -3528,6 +3595,13 @@ CREATE TABLE `tidur_user` (
   `durasi_jam` float DEFAULT NULL,
   `tanggal` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tidur_user`
+--
+
+INSERT INTO `tidur_user` (`id`, `user_id`, `jam_tidur`, `jam_bangun`, `durasi_jam`, `tanggal`) VALUES
+(1, 1, NULL, NULL, 8, '2025-12-09');
 
 --
 -- Indexes for dumped tables
@@ -3574,6 +3648,12 @@ ALTER TABLE `sessions`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `tantangan`
+--
+ALTER TABLE `tantangan`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `tantangan_user`
 --
 ALTER TABLE `tantangan_user`
@@ -3602,13 +3682,13 @@ ALTER TABLE `tidur_user`
 -- AUTO_INCREMENT for table `aktivitas_user`
 --
 ALTER TABLE `aktivitas_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `akun_user`
 --
 ALTER TABLE `akun_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `info_makanan`
@@ -3620,13 +3700,19 @@ ALTER TABLE `info_makanan`
 -- AUTO_INCREMENT for table `makanan_user`
 --
 ALTER TABLE `makanan_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tantangan`
+--
+ALTER TABLE `tantangan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tantangan_user`
@@ -3644,7 +3730,7 @@ ALTER TABLE `target_user`
 -- AUTO_INCREMENT for table `tidur_user`
 --
 ALTER TABLE `tidur_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables

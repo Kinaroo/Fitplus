@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class]);
-    }
-
     public function index()
     {
         $users = User::orderBy('id','asc')->paginate(25);

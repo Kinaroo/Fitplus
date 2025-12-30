@@ -13,9 +13,6 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        // CLEAR CACHE untuk memastikan data fresh
-        \Illuminate\Support\Facades\Cache::forget('dashboard_' . $user->id);
-        
         // Get aktivitas data for weight statistics
         $aktivitas = AktivitasUser::where('user_id', $user->id)
             ->orderBy('tanggal', 'desc')

@@ -23,7 +23,7 @@ class AuthController extends Controller
         // Validasi data input
         $validated = $request->validate([
             'nama' => 'required|string|max:100|min:3',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|unique:akun_user,email',
             'password' => 'required|min:6|max:255|confirmed',
             'jenis_kelamin' => 'nullable|in:L,P',
             'tanggal_lahir' => 'nullable|date|before:today',
@@ -34,7 +34,7 @@ class AuthController extends Controller
             $userData = [
                 'nama' => $validated['nama'],
                 'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
+                'password_hash' => Hash::make($validated['password']),
                 'jenis_kelamin' => $validated['jenis_kelamin'] ?? 'L',
                 'tanggal_lahir' => $validated['tanggal_lahir'] ?? null,
                 'tingkat_aktivitas' => 1.55,
@@ -75,14 +75,14 @@ class AuthController extends Controller
         \Log::info('Login attempt', [
             'email' => $request->email,
             'user_found' => $user ? true : false,
-            'password_hash' => $user ? substr($user->password, 0, 10) . '...' : null,
+            'password_hash' => $user ? substr($user->password_hash, 0, 10) . '...' : null,
         ]);
 
         // Cek apakah user ada dan password cocok
-        if ($user && Hash::check($request->password, $user->password)) {
+        if ($user && Hash::check($request->password, $user->password_hash)) {
             // Login user
-            auth()->loginUsingId($user->id);
-            \Log::info('Login success', ['user_id' => $user->id, 'email' => $user->email, 'authenticated' => auth()->check()]);
+            Auth::login($user);
+            \Log::info('Login success', ['user_id' => $user->id, 'email' => $user->email, 'authenticated' => Auth::check()]);
             return redirect()->intended(route('dashboard'));
         }
 
@@ -150,13 +150,12 @@ class AuthController extends Controller
 
         // Generate reset token
         $resetToken = \Illuminate\Support\Str::random(60);
-        
-        // Simpan token ke cache dengan expired 1 jam
-        \Illuminate\Support\Facades\Cache::put(
-            'password_reset_' . $request->email,
-            $resetToken,
-            \Carbon\Carbon::now()->addHours(1)
-        );
+
+        // Simpan token ke session (temporary storage - akan expired saat session berakhir)
+        session(['password_reset_' . $request->email => [
+            'token' => $resetToken,
+            'expires_at' => now()->addHours(1)->timestamp
+        ]]);
 
         // Build reset link
         $resetLink = route('password.reset.form', [
@@ -197,9 +196,22 @@ class AuthController extends Controller
         $email = $request->query('email');
         $token = $request->query('token');
 
-        // Validasi token
-        if (!$email || !$token || !Cache::has('password_reset_' . $email)) {
+        // Validasi token dari session
+        $resetData = session('password_reset_' . $email);
+        
+        if (!$email || !$token || !$resetData) {
             return redirect()->route('password.request')->withErrors(['token' => 'Link reset password tidak valid atau sudah expired']);
+        }
+        
+        // Check if token expired
+        if (isset($resetData['expires_at']) && $resetData['expires_at'] < now()->timestamp) {
+            session()->forget('password_reset_' . $email);
+            return redirect()->route('password.request')->withErrors(['token' => 'Link reset password sudah expired']);
+        }
+        
+        // Check if token matches
+        if ($resetData['token'] !== $token) {
+            return redirect()->route('password.request')->withErrors(['token' => 'Link reset password tidak valid']);
         }
 
         return view('password-reset-form', compact('email', 'token'));
@@ -216,10 +228,17 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
-        // Validasi token
-        $storedToken = \Illuminate\Support\Facades\Cache::get('password_reset_' . $request->email);
-        if (!$storedToken || $storedToken !== $request->token) {
+        // Validasi token dari session
+        $resetData = session('password_reset_' . $request->email);
+        
+        if (!$resetData || $resetData['token'] !== $request->token) {
             return back()->withErrors(['token' => 'Link reset password tidak valid']);
+        }
+        
+        // Check if token expired
+        if (isset($resetData['expires_at']) && $resetData['expires_at'] < now()->timestamp) {
+            session()->forget('password_reset_' . $request->email);
+            return back()->withErrors(['token' => 'Link reset password sudah expired']);
         }
 
         // Update password
@@ -231,8 +250,8 @@ class AuthController extends Controller
         $user->password_hash = Hash::make($request->password);
         $user->save();
 
-        // Hapus token dari cache
-        \Illuminate\Support\Facades\Cache::forget('password_reset_' . $request->email);
+        // Hapus token dari session
+        session()->forget('password_reset_' . $request->email);
 
         \Log::info('Password reset success', ['email' => $request->email]);
 

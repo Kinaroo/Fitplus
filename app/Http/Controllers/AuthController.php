@@ -37,7 +37,7 @@ class AuthController extends Controller
                 'password_hash' => Hash::make($validated['password']),
                 'jenis_kelamin' => $validated['jenis_kelamin'] ?? 'L',
                 'tanggal_lahir' => $validated['tanggal_lahir'] ?? null,
-                'tingkat_aktivitas' => 1.55,
+                'tingkat_aktivitas' => 'mid',
             ];
 
             // Buat pengguna baru
